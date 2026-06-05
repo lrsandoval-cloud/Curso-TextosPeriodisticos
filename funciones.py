@@ -32,7 +32,8 @@ def formato_fecha(fecha):
             return f"{anio}-{mes}-{int(dia):02d}"
 
     try:
-        fecha_formateada = fecha_convertida = datetime.strptime(fecha, "%d/%m/%Y %H:%M").strftime("%Y-%m-%d")
+        fecha = fecha.replace(',', '')
+        fecha_formateada = datetime.strptime(fecha, "%d/%m/%Y %H:%M").strftime("%Y-%m-%d")
     except ValueError:
         fecha_formateada = '0000-00-00'
 
@@ -58,3 +59,5 @@ def obtener_dic_palabras(base):
         palabras[rotulo] = texto
 
     return palabras
+
+

@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 import os
 
 # Colocar los nombres usados en los listados de resultados para cada medio
-medios = ['lavanguardia', 'lanacion', 'elespectador', 'elpais']
+medios = ['elpais']
 
 archivos = os.listdir('listados')
 

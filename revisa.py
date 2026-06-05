@@ -1,7 +1,7 @@
 import pandas as pd
 
 # Colocar aquí los nombres de los sitios
-pickles = ['lavanguardia', 'lanacion', 'elespectador', 'elpais']
+pickles = [ 'elpais-uy', 'lavanguardia', 'lanacion', 'elespectador']
 
 base = pd.read_pickle('pickles/' + pickles[0] + '.pkl').copy()
 base.drop(base.index, inplace=True)

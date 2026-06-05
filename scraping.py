@@ -1,39 +1,53 @@
 from bs4 import BeautifulSoup
 import requests
+import cloudscraper
 import funciones
 import pandas as pd
 import time
 
-sitio = 'elpais'
+sitio = 'elpais-uy'
 
 d_titulo = {
     'tag' : 'h1',
-    'attrs' : {'class': 'a_t'}
+    'attrs' : {'class': 'Page-headline'}
 }
 
 d_copete = {
-    'tag' : 'p',
-    'attrs' : {'class': 'a_st'}
+    'tag' : 'h2',
+    'attrs' : {'class': 'Page-subHeadline'}
 }
 
+contenedor = True
 d_texto = {
     'tag' : 'div',
-    'attrs' : {'class' : 'a_c'}
+    'attrs' : {'class' : 'RichTextArticleBody'}
 }
+cadenas_para_eliminar = []
 
 d_fecha = {
     'tag': 'div',
-    'attrs' : {'class': 'a_md_f'}
+    'attrs' : {'class': 'Page-datePublished'}
+}
+
+headers = {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 }
 
 df = pd.DataFrame(columns = ['medio', 'titulo', 'fecha', 'copete', 'texto', 'url', 'ranking'])
 
 direcciones = open('listados/' + sitio + '.txt', 'r')
+scraper = cloudscraper.create_scraper()
 ranking = 1
 for l in direcciones:
     url = l[:-1]
     print(ranking, url)
-    pagina = requests.get(url)
+    pagina = requests.get(url, headers=headers)
+    #pagina = scraper.get(url)
+    contenido = pagina.text
+    #print(contenido)
+    #exit()
+
+    pagina.encoding = 'utf-8'
     sopa = BeautifulSoup(pagina.text, 'lxml')
     cuerpo = sopa.find('body')
 
@@ -46,16 +60,31 @@ for l in direcciones:
             titulo = ''
 
     texto = ''
-    parrafos = cuerpo.find_all(d_texto['tag'], d_texto.get('attrs', {}))
-    if parrafos:
-        for p in parrafos:
-            texto += p.text + ' '
+    if contenedor:
+        for divisor in cuerpo.find_all(d_texto['tag'], d_texto.get('attrs', {})):
+            for parrafo in divisor.select('p, h2, h3, li'):
+                p_limpio = parrafo.text.rstrip()
+                if p_limpio[-1:] != '.':
+                    texto += p_limpio + '. '
+                else:
+                    texto += p_limpio + ' '
+    else:
+        for parrafo in cuerpo.find_all(d_texto['tag'], d_texto.get('attrs', {})):
+            p_limpio = parrafo.text.rstrip()
+            if p_limpio[-1:] != '.':
+                texto += p_limpio + '. '
+            else:
+                texto += p_limpio + ' '
+    for cadena in cadenas_para_eliminar:
+        texto = texto.replace(cadena, '')
 
     copete = ''
-    parrafos = cuerpo.find(d_copete['tag'], d_copete.get('attrs', {}))
-    if parrafos:
-        for p in parrafos:
-            copete += p.text + ' '
+    copete = cuerpo.find(d_copete['tag'], d_copete.get('attrs', {}))
+    if copete:
+        try:
+            copete = copete.text.strip()
+        except AttributeError:
+            copete = ''
 
     fecha = ''
     fecha1 = cuerpo.find(d_fecha['tag'], d_fecha.get('attrs', {}))
@@ -65,13 +94,12 @@ for l in direcciones:
         except AttributeError:
             fecha = ''
 
-    '''
     print(titulo)
     print(copete)
     print(texto)
     print(fecha)
     exit()
-    '''
+
 
     df.loc[len(df)] = {
         'medio' : sitio,
