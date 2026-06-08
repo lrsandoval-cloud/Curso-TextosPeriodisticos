@@ -10,35 +10,36 @@ import time
 # Colocar True para verificar que obtiene la página de acuerdo al enfoque seleccionado
 prueba_url = False
 
-# Colocar True para verificar que captura bein los campos (título, copete, texto, fecha)
-prueba_captura = True
+# Colocar True para verificar que captura bien los campos (título, copete, texto, fecha)
+prueba_captura = False
 
-sitio = 'elpais-uy'
+# Los enfoques posibles son 'requests', 'scraper' y 'selenium'. request funciona por defecto
+enfoque = ''
+
+sitio = 'elespectador'
 
 d_titulo = {
     'tag' : 'h1',
-    'attrs' : {'class': 'Page-headline'}
+    'attrs' : {'class' : 'ArticleHeader-Title'}
 }
 
 d_copete = {
     'tag' : 'h2',
-    'attrs' : {'class': 'Page-subHeadline'}
+    'attrs' : {'class': 'ArticleHeader-Hook'}
 }
 
 contenedor = True
 d_texto = {
     'tag' : 'div',
-    'attrs' : {'class' : 'RichTextArticleBody'}
+    'attrs' : {'class' : 'Article-Content'}
 }
-cadenas_para_eliminar = []
+cadenas_para_eliminar = ['Escucha este artículo.', 'Audio generado con IA de Google.', '0:00. /. 0:00.']
 
 d_fecha = {
     'tag': 'div',
-    'attrs' : {'class': 'Page-datePublished'}
+    'attrs' : {'class' : 'ArticleHeader-Date'}
 }
 
-# Los enfoques posibles son 'requests', 'scraper' y 'selenium'. request funciona por defecto
-enfoque = 'selenium'
 
 ########################################################################
 ######     FINAL DE CONFIGURACIÓN     ##################################
