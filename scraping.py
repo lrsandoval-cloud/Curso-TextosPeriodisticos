@@ -1,9 +1,17 @@
 from bs4 import BeautifulSoup
-import requests
-import cloudscraper
 import funciones
 import pandas as pd
 import time
+
+#########################################################################################
+########         CONFIGURACIÓN DE ACUERDO AL SITIO ESPECÍFICO     #######################
+#########################################################################################
+
+# Colocar True para verificar que obtiene la página de acuerdo al enfoque seleccionado
+prueba_url = False
+
+# Colocar True para verificar que captura bein los campos (título, copete, texto, fecha)
+prueba_captura = True
 
 sitio = 'elpais-uy'
 
@@ -29,26 +37,64 @@ d_fecha = {
     'attrs' : {'class': 'Page-datePublished'}
 }
 
-headers = {
-    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-}
+# Los enfoques posibles son 'requests', 'scraper' y 'selenium'. request funciona por defecto
+enfoque = 'selenium'
+
+########################################################################
+######     FINAL DE CONFIGURACIÓN     ##################################
+########################################################################
+
+
+
+if enfoque == 'scraper':
+    import cloudscraper
+    scraper = cloudscraper.create_scraper()
+elif enfoque == 'selenium':
+    from selenium import webdriver
+    from selenium.webdriver.firefox.options import Options
+    from selenium.webdriver.firefox.service import Service
+    import platform
+    from subprocess import getoutput
+    options = Options()
+    sistema_actual = platform.system()
+    if sistema_actual == "Linux":
+        options.binary_location = getoutput("find /snap/firefox -name firefox").split("\n")[-1]
+        driver = webdriver.Firefox(
+            service=Service(executable_path=getoutput("find /snap/firefox -name geckodriver").split("\n")[-1]),
+            options=options)
+    elif sistema_actual == "Windows":
+        driver = webdriver.Firefox(options=options)
+else:
+    import requests
+    headers = {
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
 
 df = pd.DataFrame(columns = ['medio', 'titulo', 'fecha', 'copete', 'texto', 'url', 'ranking'])
 
 direcciones = open('listados/' + sitio + '.txt', 'r')
-scraper = cloudscraper.create_scraper()
 ranking = 1
 for l in direcciones:
     url = l[:-1]
     print(ranking, url)
-    pagina = requests.get(url, headers=headers)
-    #pagina = scraper.get(url)
-    contenido = pagina.text
-    #print(contenido)
-    #exit()
+    if enfoque == 'scraper':
+        pagina = scraper.get(url)
+        pagina.encoding = 'utf-8'
+        contenido = pagina.text
+    elif enfoque == 'selenium':
+        driver.get(url)
+        pagina = driver.page_source
+        contenido = pagina
+    else:
+        pagina = requests.get(url, headers=headers)
+        contenido = pagina.text
+        pagina.encoding = 'utf-8'
 
-    pagina.encoding = 'utf-8'
-    sopa = BeautifulSoup(pagina.text, 'lxml')
+    if prueba_url:
+        print(contenido)
+        break
+
+    sopa = BeautifulSoup(contenido, 'lxml')
     cuerpo = sopa.find('body')
 
     titulo = ''
@@ -94,12 +140,12 @@ for l in direcciones:
         except AttributeError:
             fecha = ''
 
-    print(titulo)
-    print(copete)
-    print(texto)
-    print(fecha)
-    exit()
-
+    if prueba_captura:
+        print('TITULO:\n', titulo, end='\n\n')
+        print('COPETE:\n', copete, end='\n\n')
+        print('TEXTO:\n', texto, end='\n\n')
+        print('FECHA:\n', fecha)
+        break
 
     df.loc[len(df)] = {
         'medio' : sitio,
@@ -116,6 +162,9 @@ for l in direcciones:
     if ranking % 10 == 0:
         df.to_pickle('pickles/' + sitio + '.pkl')
 
-df.to_pickle('pickles/' + sitio + '.pkl')
+if enfoque == 'selenium':
+    driver.quit()
 
-print(df)
+if prueba_url == False and prueba_captura == False:
+    df.to_pickle('pickles/' + sitio + '.pkl')
+    print(df)
