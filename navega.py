@@ -1,6 +1,9 @@
-sitio = 'clarin.com'
+sitio = 'sitio.com' # Colocar el dominio. Por ejemplo: para https://www.clarin.com/ colocar 'clarin.com'
 
-keywords = ['adolescencia,adolescentes', 'tecnologia']
+# Indicar los términos de búsqueda. Entre comas los términos equivalentes (OR)
+# En el caso de ejemplo buscará casos que cumplan con termino1a o termino1b y además
+# con termino2
+keywords = ['termino1a,termino1b', 'termino2']
 cantidad = 50 # cantidad de resultados por período
 fecha_inicial = '2026-04-30' # Tener en cuenta que el período arranca un día después de esta fecha
 fecha_final = '2026-05-30'
