@@ -1,15 +1,18 @@
-sitio = 'elpais.com.uy'
+sitio = 'clarin.com'
 
 keywords = ['adolescencia,adolescentes', 'tecnologia']
 cantidad = 50 # cantidad de resultados por período
-fecha_inicial = '2026-04-01' # Tener en cuenta que el período arranca un día después de esta fecha
+fecha_inicial = '2026-04-30' # Tener en cuenta que el período arranca un día después de esta fecha
 fecha_final = '2026-05-30'
 periodo = 30 # en días
+navegador = 'chrome'    # Puede ser 'firefox' o 'chrome'
 
 from datetime import datetime, timedelta
 from selenium import webdriver
-from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.firefox.service import Service
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.firefox.service import Service as FirefoxService
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.common.by import By
 from subprocess import getoutput
 import time
@@ -28,18 +31,38 @@ for keyw in keywords:
         palabra += keyw + '+AND+'
 palabra = palabra[:-5]
 
-
-options = Options()
 sistema_actual = platform.system()
-if sistema_actual == "Linux":
-    options.binary_location = getoutput("find /snap/firefox -name firefox").split("\n")[-1]
-    driver = webdriver.Firefox(
-        service=Service(executable_path=getoutput("find /snap/firefox -name geckodriver").split("\n")[-1]),
-        options=options)
-elif sistema_actual == "Windows":
-    driver = webdriver.Firefox(options=options)
+if navegador.lower() == "firefox":
+    options = FirefoxOptions()
+    if sistema_actual == "Linux":
+        options.binary_location = getoutput("find /snap/firefox -name firefox").split("\n")[-1]
+        driver = webdriver.Firefox(
+            service=FirefoxService(executable_path=getoutput("find /snap/firefox -name geckodriver").split("\n")[-1]),
+            options=options)
+    elif sistema_actual == "Windows":
+        driver = webdriver.Firefox(options=options)
+elif navegador.lower() == "chrome":
+    options = ChromeOptions()
+    if sistema_actual == "Linux":
+        # Mantenemos la búsqueda del binario por si es Snap,
+        # pero si está en /usr/bin/google-chrome, Selenium lo detecta solo.
+        ruta_chrome = getoutput("which google-chrome || find /snap/chromium -name chromium").split("\n")[-1]
+        if ruta_chrome:
+            options.binary_location = ruta_chrome
 
+        # SI ES SNAP: Necesitamos buscar el driver de snap obligatoriamente
+        if "snap" in ruta_chrome:
+            ruta_chromedriver = getoutput("find /snap/chromium -name chromedriver").split("\n")[-1]
+            if ruta_chromedriver:
+                driver = webdriver.Chrome(service=ChromeService(executable_path=ruta_chromedriver), options=options)
+        else:
+            # SI NO ES SNAP (Tu caso actual): Dejamos que Selenium gestione el driver solo.
+            # Esto descargará automáticamente la versión 149 compatible.
+            driver = webdriver.Chrome(options=options)
+    elif sistema_actual == "Windows":
+        driver = webdriver.Chrome(options=options)
 
+contador_periodo = 1
 while fecha_arranque <= fecha_limite:
     consulta = 'https://www.google.com.ar/search?q=' + palabra + '+site%3A' + sitio
     consulta += '+after%3A' + str(fecha_arranque)
@@ -68,8 +91,9 @@ while fecha_arranque <= fecha_limite:
             break
         else:
             html = driver.page_source
-            with open('listados/' + sitio + '_' + str(fecha_arranque) + '_' +  paginado + '.html', "w", encoding="utf-8") as f:
+            with open('listados/' + sitio + '_' + str(fecha_arranque) + '_' + str(contador_periodo) + '_' +  paginado + '.html', "w", encoding="utf-8") as f:
                 f.write(html)
 
+    contador_periodo += 1
 
 driver.quit()

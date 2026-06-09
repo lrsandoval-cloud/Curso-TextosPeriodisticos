@@ -37,6 +37,13 @@ def formato_fecha(fecha):
     except ValueError:
         fecha_formateada = '0000-00-00'
 
+    if fecha_formateada == '0000-00-00':
+        try:
+            fecha = fecha[:16].replace('.', '/')
+            fecha_formateada = datetime.strptime(fecha[:16], "%d/%m/%Y %H:%M").strftime("%Y-%m-%d")
+        except ValueError:
+            fecha_formateada = '0000-00-00'
+
     return fecha_formateada
 
 
@@ -61,3 +68,9 @@ def obtener_dic_palabras(base):
     return palabras
 
 
+def tipo_producto(producto):
+    if producto == 'Huevos':
+        forma = 'docena'
+    else:
+        forma = 'kg'
+    return forma
