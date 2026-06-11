@@ -11,7 +11,7 @@ periodo = 176 # en días
 navegador = 'firefox'    # Puede ser 'firefox' o 'chrome'
 prueba_periodos = True     # True solo muestra las fechas de inicio de cada período y la cantidad de
                             # de días del último
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.firefox.service import Service as FirefoxService
@@ -34,7 +34,7 @@ if prueba_periodos == True:
         print(contador,fecha)
         fecha += paso
         contador += 1
-    print(date.today() - fecha + paso)
+    print(fecha_limite - fecha + paso)
     exit()
 
 
