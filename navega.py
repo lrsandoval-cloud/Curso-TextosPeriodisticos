@@ -1,16 +1,17 @@
-sitio = 'sitio.com' # Colocar el dominio. Por ejemplo: para https://www.clarin.com/ colocar 'clarin.com'
+sitio = 'lanacion.com.ar' # Colocar el dominio. Por ejemplo: para https://www.clarin.com/ colocar 'clarin.com'
 
 # Indicar los términos de búsqueda. Entre comas los términos equivalentes (OR)
 # En el caso de ejemplo buscará casos que cumplan con termino1a o termino1b y además
 # con termino2
 keywords = ['termino1a,termino1b', 'termino2']
-cantidad = 50 # cantidad de resultados por período
-fecha_inicial = '2026-04-30' # Tener en cuenta que el período arranca un día después de esta fecha
-fecha_final = '2026-05-30'
-periodo = 30 # en días
-navegador = 'chrome'    # Puede ser 'firefox' o 'chrome'
-
-from datetime import datetime, timedelta
+cantidad = 20 # cantidad de resultados por período
+fecha_inicial = '2024-12-31' # Tener en cuenta que el período arranca un día después de esta fecha
+fecha_final = '2026-06-11'
+periodo = 176 # en días
+navegador = 'firefox'    # Puede ser 'firefox' o 'chrome'
+prueba_periodos = True     # True solo muestra las fechas de inicio de cada período y la cantidad de
+                            # de días del último
+from datetime import datetime, timedelta, date
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.firefox.service import Service as FirefoxService
@@ -25,6 +26,17 @@ fecha_arranque = datetime.strptime(fecha_inicial, '%Y-%m-%d').date()
 fecha_limite = datetime.strptime(fecha_final, '%Y-%m-%d').date()
 paso = timedelta(days=periodo)
 un_dia = timedelta(days=1)
+
+if prueba_periodos == True:
+    contador = 1
+    fecha = fecha_arranque
+    while fecha < fecha_limite:
+        print(contador,fecha)
+        fecha += paso
+        contador += 1
+    print(date.today() - fecha + paso)
+    exit()
+
 
 palabra = ''
 for keyw in keywords:
@@ -42,6 +54,7 @@ if navegador.lower() == "firefox":
         driver = webdriver.Firefox(
             service=FirefoxService(executable_path=getoutput("find /snap/firefox -name geckodriver").split("\n")[-1]),
             options=options)
+
     elif sistema_actual == "Windows":
         driver = webdriver.Firefox(options=options)
 elif navegador.lower() == "chrome":
@@ -75,13 +88,17 @@ while fecha_arranque <= fecha_limite:
 
     for i in range(0, cantidad, 10):
         url = consulta + str(i)
-        #print(url)
+        print(url)
+        #continue
 
         driver.get(url)
 
         if i < 10:
             paginado = '00' + str(i)
-            time.sleep(40)
+            if contador_periodo == 1:
+                time.sleep(40)
+            else:
+                time.sleep(5)
         elif i >= 10 and i < 100:
             paginado = '0' + str(i)
             time.sleep(5)
