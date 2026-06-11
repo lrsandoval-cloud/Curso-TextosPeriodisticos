@@ -11,36 +11,38 @@ import time
 prueba_url = False
 
 # Colocar True para verificar que captura bien los campos (título, copete, texto, fecha)
-prueba_captura = False
+prueba_captura = True
+url_prueba = ''
 
-# Los enfoques posibles son 'requests', 'scraper' y 'selenium'. request funciona por defecto
-enfoque = ''
+sitio = 'dominiositio'  # Indicar nombre del sitio que coincida con el del listado,
+                        # por ejemplo: 'lanacion'
 
-sitio = 'eltiempo'
+# Los enfoques posibles son 'requests', 'scraper' y 'selenium'. requests funciona por defecto
+enfoque = 'selenium'
 
 d_titulo = {
-    'tag' : 'h1',
-    'attrs' : {'class' : 'c-articulo__titulo'}
+    'tag' : '',
+    'attrs' : {'class' : ['']}
 }
 
 d_copete = {
-    'tag' : 'h2',
-    'attrs' : {'class': 'c-lead__titulo'}
+    'tag' : [''],
+    'attrs' : {'class': ['']}
 }
 
 contenedor = True
 d_texto = {
-    'tag' : 'div',
-    'attrs' : {'class' : 'c-cuerpo'}
+    'tag' : [''],
+    'attrs' : {'class' : ['']}
 }
-tags_contenedor = 'p, h2, li, div'
-cadenas_para_eliminar = ['. . . . ']
-tags_a_eliminar = ['div', 'div']
-clases_a_eliminar = ['c-leatambien', 'related-links']
+tags_contenedor = 'p, h2, h3, li, div'
+cadenas_para_eliminar = ['']
+tags_a_eliminar = ['']
+clases_a_eliminar = ['']
 
 d_fecha = {
-    'tag': 'span',
-    'attrs' : {'class' : 'c-articulo__autor__fecha'}
+    'tag': '',
+    'attrs' : {'class' : ['']}
 }
 
 
@@ -60,6 +62,7 @@ elif enfoque == 'selenium':
     import platform
     from subprocess import getoutput
     options = Options()
+    options.set_preference("javascript.enabled", False)
     sistema_actual = platform.system()
     if sistema_actual == "Linux":
         options.binary_location = getoutput("find /snap/firefox -name firefox").split("\n")[-1]
@@ -80,6 +83,11 @@ direcciones = open('listados/' + sitio + '.txt', 'r')
 ranking = 1
 for l in direcciones:
     url = l[:-1]
+    if sitio not in url:
+        continue
+    elif prueba_url != True:
+        if prueba_captura == True and url_prueba != url:
+            continue
     print(ranking, url)
     if enfoque == 'scraper':
         pagina = scraper.get(url)
@@ -95,7 +103,9 @@ for l in direcciones:
         pagina.encoding = 'utf-8'
 
     if prueba_url:
-        print(contenido)
+        sopa = BeautifulSoup(contenido, 'lxml')
+        cuerpo = sopa.find('body')
+        print(cuerpo.text)
         break
 
     sopa = BeautifulSoup(contenido, 'lxml')
@@ -174,5 +184,5 @@ if enfoque == 'selenium':
     driver.quit()
 
 if prueba_url == False and prueba_captura == False:
-    df.to_pickle('pickles/' + sitio + '.pkl')
+    df.to_pickle('pickles/' + sitio + '_pocos.pkl')
     print(df)

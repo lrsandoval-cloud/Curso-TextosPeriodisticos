@@ -19,7 +19,7 @@ def formato_fecha(fecha):
         'nov': 11, 'noviembre': 11,
         'dic': 12, 'diciembre': 12
     }
-
+    fecha = fecha.strip()
     #def parsear_fecha(fecha_str):
     # Buscar algo tipo "23 de octubre de 2024"
     #patron = r'(\d{1,2})\s*(?:de\s*)?([a-zñ]+)\s*(?:de\s*)?(\d{4})'
