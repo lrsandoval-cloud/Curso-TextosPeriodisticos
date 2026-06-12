@@ -11,6 +11,7 @@ periodo = 176 # en días
 navegador = 'firefox'    # Puede ser 'firefox' o 'chrome'
 prueba_periodos = True     # True solo muestra las fechas de inicio de cada período y la cantidad de
                             # de días del último
+
 from datetime import datetime, timedelta
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
@@ -54,26 +55,19 @@ if navegador.lower() == "firefox":
         driver = webdriver.Firefox(
             service=FirefoxService(executable_path=getoutput("find /snap/firefox -name geckodriver").split("\n")[-1]),
             options=options)
-
     elif sistema_actual == "Windows":
         driver = webdriver.Firefox(options=options)
 elif navegador.lower() == "chrome":
     options = ChromeOptions()
     if sistema_actual == "Linux":
-        # Mantenemos la búsqueda del binario por si es Snap,
-        # pero si está en /usr/bin/google-chrome, Selenium lo detecta solo.
         ruta_chrome = getoutput("which google-chrome || find /snap/chromium -name chromium").split("\n")[-1]
         if ruta_chrome:
             options.binary_location = ruta_chrome
-
-        # SI ES SNAP: Necesitamos buscar el driver de snap obligatoriamente
         if "snap" in ruta_chrome:
             ruta_chromedriver = getoutput("find /snap/chromium -name chromedriver").split("\n")[-1]
             if ruta_chromedriver:
                 driver = webdriver.Chrome(service=ChromeService(executable_path=ruta_chromedriver), options=options)
         else:
-            # SI NO ES SNAP (Tu caso actual): Dejamos que Selenium gestione el driver solo.
-            # Esto descargará automáticamente la versión 149 compatible.
             driver = webdriver.Chrome(options=options)
     elif sistema_actual == "Windows":
         driver = webdriver.Chrome(options=options)
