@@ -55,7 +55,7 @@ if navegador.lower() == "firefox":
         driver = webdriver.Firefox(
             service=FirefoxService(executable_path=getoutput("find /snap/firefox -name geckodriver").split("\n")[-1]),
             options=options)
-    elif sistema_actual == "Windows":
+    elif sistema_actual in ["Windows", "Darwin"]:
         driver = webdriver.Firefox(options=options)
 elif navegador.lower() == "chrome":
     options = ChromeOptions()
@@ -69,7 +69,7 @@ elif navegador.lower() == "chrome":
                 driver = webdriver.Chrome(service=ChromeService(executable_path=ruta_chromedriver), options=options)
         else:
             driver = webdriver.Chrome(options=options)
-    elif sistema_actual == "Windows":
+    elif sistema_actual in ["Windows", "Darwin"]:
         driver = webdriver.Chrome(options=options)
 
 contador_periodo = 1
