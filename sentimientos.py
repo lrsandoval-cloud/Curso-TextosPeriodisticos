@@ -10,10 +10,12 @@ sentimientos['label'] = sentimientos['label'].astype(int)
 
 from statistics import mean
 from statistics import median
+from statistics import mode
 
 print ('-------------- DATOS GENERALES')
 print('Media de label:', mean(sentimientos['label']))
 print('Mediana de label:', median(sentimientos['label']))
+print('Moda de label:', mode(sentimientos['label']))
 print('Media de score:', mean(sentimientos['score']))
 print('Score mínimo:', sentimientos.iloc[sentimientos['score'].idxmin(), 2])
 print('Score máximo:', sentimientos.iloc[sentimientos['score'].idxmax(), 2])
@@ -28,10 +30,11 @@ for sc in scores:
     linea.append(len(menos_sentimientos))
     linea.append(mean(menos_sentimientos['label']))
     linea.append(median(menos_sentimientos['label']))
+    linea.append(mode(menos_sentimientos['label']))
     linea.append(mean(menos_sentimientos['score']))
     tabla.append(linea)
 
-confiabilidades = pd.DataFrame(tabla, columns=['score_menor_a', 'N', 'media', 'mediana', 'media_score'])
+confiabilidades = pd.DataFrame(tabla, columns=['score_menor_a', 'N', 'media', 'mediana', 'moda', 'media_score'])
 
 print("\n----------- Valores medios de acuerdo a rangos de confiabilidad")
 print(confiabilidades.to_string(index=False))
@@ -46,6 +49,7 @@ for medio in rotulos:
     sentimientos_medio = sentimientos_minimo[sentimientos_minimo['medio']==medio].copy()
     fila.append(mean(sentimientos_medio['label']))
     fila.append(median(sentimientos_medio['label']))
+    fila.append(mode(sentimientos_medio['label']))
     fila.append(mean(sentimientos_medio['score']))
     resultado.append(fila)
     fila = []
@@ -53,10 +57,11 @@ for medio in rotulos:
 fila = ['Todos']
 fila.append(mean(sentimientos_medio['label']))
 fila.append(median(sentimientos_medio['label']))
+fila.append(mode(sentimientos_medio['label']))
 fila.append(mean(sentimientos_medio['score']))
 resultado.append(fila)
 
-df_resultado = pd.DataFrame(resultado, columns=['medio', 'media de label', 'mediana de label', 'media de score'])
+df_resultado = pd.DataFrame(resultado, columns=['medio', 'media de label', 'mediana de label', 'moda de label', 'media de score'])
 print()
 print("\n----------- Valores medios según medio (score > " + str(score_minimo) + ")")
 print(df_resultado.to_string(index=False))
