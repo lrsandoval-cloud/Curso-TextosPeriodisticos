@@ -3,6 +3,8 @@ import pandas as pd
 
 cantidad_keywords = 15  # Cuántas palabras clave mostrará para cada tema
 cantidad_articulos = 5  # y cuántos artículos (entre los más emblemáticos)
+mostrar_articulos = True
+mostrar_grafico_idm = True
 
 
 
@@ -47,6 +49,9 @@ for tema in temas_validos:
     palabras_clave = [pal for pal, _ in topic_model.get_topic(tema)[:cantidad_keywords]]
     print("Palabras clave:", ', '.join(palabras_clave))
 
+    if mostrar_articulos == False:
+        continue
+
     # 6.1. Calculamos la similitud de TODOS los documentos con este tema específico
     # Esto da una lista de puntuaciones de 0 a 1 para cada artículo
     similitudes = topic_model.approximate_distribution(base['texto_completo'].tolist(), window=1)[0]
@@ -67,9 +72,10 @@ for tema in temas_validos:
         print(f"- [{fila['puntuacion_tema']:.2f}] {fila['titulo']} [{fila['medio']}]")
 
 
-# 7. Genera el Mapa de Distancia Intertópicos (en el browser por defecto)
-fig = topic_model.visualize_topics()
-fig.show()
+if mostrar_grafico_idm:
+    # 7. Genera el Mapa de Distancia Intertópicos (en el browser por defecto)
+    fig = topic_model.visualize_topics()
+    fig.show()
 
-# Descomentar si se quiere guardar el gráfico
-#fig.write_html("grafico_bertopic.html")
+    # Descomentar si se quiere guardar el gráfico
+    #fig.write_html("grafico_bertopic.html")
