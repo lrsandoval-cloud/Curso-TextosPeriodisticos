@@ -2,38 +2,21 @@
 # Opciones: 'PER', 'ORG', 'LOC', 'TODAS'
 # 'PER': personas, 'ORG': organizaciones, 'LOC': lugares
 # 'TODAS' es valor por defecto
-entidad_para_nube = ''
-
-idioma = 'es' # Opciones: es (español, en (inglés)
 
 # Seleccionar modelo: 'sm', 'md', 'lg'
 # (sm: small, md: medium, lg: large)
-modelo = 'lg'
 
 # Correcciones 1: Incluir los términos que se quieren unificar o modificar
 MAPEO_ENTIDADES = {
     "internet": "Internet",
-    "tiktok": "TikTok",
-    "instagram": "Instagram",
-    "meta": "Meta",
     "Zuckerberg" : "Mark Zuckerberg"
 }
 
 # Correcciones 2: Lista de entidades basura para ignorar por completo
-ENTIDADES_IGNORAR = {"¿cómo", "¿qué", "¿", "?", "cómo", "qué", "cuál", "¿cuál",
-                     "Son los 16 años una buena edad", "Son perjudiciales las redes",
-                     "Instagram para niños"
                      }
 
 ##########   FINAL DE LA CONFIGURACIÓN ############
 
-
-
-from collections import Counter
-import pandas as pd
-import spacy
-from wordcloud import WordCloud
-import matplotlib.pyplot as plt
 
 pd.set_option('display.max_columns', None)
 pd.set_option('display.width', 300)
@@ -41,10 +24,7 @@ pd.set_option('display.max_colwidth', 40)
 
 base = pd.read_pickle("pickles/base.pkl")
 
-if idioma == 'es':
     nlp = spacy.load("es_core_news_" + modelo)
-elif idioma == 'en':
-    nlp = spacy.load("en_core_web_" + modelo)
 
 contador_categorias = Counter()
 contador_entidades_exactas = Counter()
@@ -111,19 +91,10 @@ print(
     ]
 )
 
-etiqueta_buscada = entidad_para_nube
-
-if idioma == 'en':
-    if entidad_para_nube == 'PER':
-        etiqueta_buscada = 'PERSON'
-    elif entidad_para_nube == 'LOC':
-        etiqueta_buscada = 'GPE'
-
 if entidad_para_nube in ['PER', 'ORG', 'LOC']:
     frecuencias_nube = {
         texto: freq
         for (texto, tipo), freq in contador_entidades_exactas.items()
-        if tipo == etiqueta_buscada
     }
 else:
     frecuencias_nube = {

@@ -1,5 +1,3 @@
-idioma = 'es' # Opciones: es (español), en (inglés)
-
 from bertopic import BERTopic
 from bertopic.representation import MaximalMarginalRelevance
 from sklearn.feature_extraction.text import CountVectorizer
@@ -34,7 +32,6 @@ umap_model = umap.UMAP(
     random_state=42       # Para que el resultado sea reproducible
 )
 
-
 # 2. Configuración de eHDBSCAN (Para controlar los outliers en corpus chico)
 hdbscan_model = HDBSCAN(
     min_cluster_size=minimo_articulos,
@@ -42,24 +39,16 @@ hdbscan_model = HDBSCAN(
     prediction_data=True
 )
 
-
 # 3. Configuración del Vectorizador
 vectorizer_model = CountVectorizer(
-    stop_words = obtener_stop_words(idioma)
 )
 
 # 4. Inicialización de BERTopic
-if idioma == 'es':
-    lenguaje = 'multilingual'
-elif idioma == 'en':
-    lenguaje = 'english'
-
 topic_model = BERTopic(
     umap_model=umap_model,
     hdbscan_model=hdbscan_model,
     vectorizer_model=vectorizer_model,
     nr_topics=cantidad_temas,
-    language=lenguaje
 )
 
 # 5. Entrenamiento del modelo

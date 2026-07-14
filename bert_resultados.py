@@ -10,7 +10,6 @@ pd.set_option('display.max_columns', None)
 pd.set_option('display.width', 300)
 pd.set_option('display.max_colwidth', 40)
 
-base = pd.read_pickle('pickles/base_eng.pkl')
 
 base['texto_completo'] = (
     base['titulo'].fillna('') + " " +

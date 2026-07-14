@@ -1,5 +1,3 @@
-idioma = 'es' # Opciones: es (español), en (inglés)
-
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import NMF
@@ -16,7 +14,6 @@ base = pd.read_pickle('pickles/base.pkl')
 tfidf_vectorizer = TfidfVectorizer(
     max_df=0.95,          # Ignora palabras que aparecen en más del 95% de los artículos
     min_df=2,             # Ignora palabras que aparecen en menos de 2 artículos
-    stop_words=obtener_stop_words(idioma)  # Filtro básico de stopwords (por si quedó alguna)
 )
 
 tfidf_matrix = tfidf_vectorizer.fit_transform(base['lemas'])
