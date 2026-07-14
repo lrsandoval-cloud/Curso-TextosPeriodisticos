@@ -1,9 +1,11 @@
-clusters = 8    # Indicar el número de grupos que se quiere establecer
+clusters = 9    # Indicar el número de grupos que se quiere establecer
 titulares = 5   # Indicar la cantidad de notas que me indicará como emblemáticas del clúster
 idioma = 'es' # Opciones: es (español), en (inglés)
 
 import pandas as pd
-base = pd.read_pickle('pickles/base.pkl')
+base = pd.read_pickle('pickles/scielo_uy.pkl').query("Idioma == 'es'")
+base.reset_index(drop=True, inplace=True)
+
 
 from funciones import obtener_stop_words
 stop_words = obtener_stop_words(idioma)
@@ -114,13 +116,13 @@ for c in range(clusters):
     url = []
     # Recorro ese df reducido y obtengo títulos y urls que incluyo en listas
     for i, row in articulos_k.iterrows():
-        titu.append(row['titulo'] + " [" + row['medio'] + "]")
-        url.append(row['url'])
+        titu.append(row['Título'])
+        url.append(row['URL'])
     titulos.append(titu)
     urls.append(url)
 
 # Guardo la base, que ahora va a tener dos columnas más: 'cluster' y 'distancia'
-pd.to_pickle(base, 'pickles/base.pkl')
+#pd.to_pickle(base, 'pickles/scielo_uy_esp.pkl')
 
 
 # El último fragmento de código genera un archivo HTML con las palabras clave y los títulos
@@ -139,7 +141,7 @@ for c in range(clusters):
 
 texto +"</body>\n</html>"
 
-listado = open('clusters.html', 'w')
+listado = open('scielo_clusters.html', 'w')
 listado.write(texto)
 listado.close()
 

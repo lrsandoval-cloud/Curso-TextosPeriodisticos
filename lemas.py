@@ -1,10 +1,11 @@
 import pandas as pd
-
-base = pd.read_pickle('pickles/base.pkl')
-
 import spacy
 
-nlp = spacy.load('es_core_news_sm')
+modelo = 'en_core_web_sm'
+base = pd.read_pickle('pickles/base_eng.pkl')
+
+
+nlp = spacy.load(modelo)
 
 base['lemas'] = ''
 
@@ -21,10 +22,10 @@ for i, row in base.iterrows():
 
     lemas = []
     for token in doc:
-        if token.pos_ not in ['ADP', 'DET', 'PRON', 'NUM', 'CCONJ', 'SCONJ', 'PUNCT', 'SYM']:
+        if token.pos_ not in ['ADP', 'DET', 'PRON', 'NUM', 'CCONJ', 'SCONJ', 'PUNCT', 'SYM', 'PART']:
             if not token.is_stop:
                 lemas.append(token.lemma_.lower())
     base.loc[i, 'lemas'] = " ".join(lemas)
 
 
-pd.to_pickle(base, 'pickles/base.pkl')
+pd.to_pickle(base, 'pickles/base_eng.pkl')

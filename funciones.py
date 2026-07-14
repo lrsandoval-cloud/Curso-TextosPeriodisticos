@@ -47,9 +47,15 @@ def formato_fecha(fecha):
     return fecha_formateada
 
 
-def obtener_stop_words():
-    with open('spanish.txt') as f:
-        stop_words = f.read().splitlines()
+def obtener_stop_words(idioma='es'):
+    if idioma == 'es':
+        with open('spanish.txt') as f:
+            stop_words = f.read().splitlines()
+    elif idioma == 'en':
+        # import nltk
+        from nltk.corpus import stopwords
+        # nltk.download('stopwords')
+        stop_words = list(stopwords.words('english'))
     with open('mas_stopwords.txt') as f:
         agregar = f.read().splitlines()
     stop_words = stop_words + agregar
@@ -74,3 +80,44 @@ def tipo_producto(producto):
     else:
         forma = 'kg'
     return forma
+
+
+
+
+def obtiene_json(sopa, campo=False):
+
+    import json
+
+    for script in sopa.find_all("script", type="application/ld+json"):
+
+        try:
+            data = json.loads(script.string)
+
+            if not isinstance(data, dict):
+                continue
+
+            tipo = data.get("@type")
+
+            if (
+                tipo == "NewsArticle"
+                or tipo == "Article"
+                or tipo == "ReportageNewsArticle"
+                or (
+                    isinstance(tipo, list)
+                    and "NewsArticle" in tipo
+                )
+            ):
+                if campo:
+                    campos = {'titulo' : 'headline', 'copete' : "description", 'fecha' : 'datePublished', 'texto' : 'articleBody'}
+                    if campo == 'fecha':
+                        dato = data['datePublished'][:10]
+                    else:
+                        dato = data[campos[campo]]
+                    return dato
+                else:
+                    return data
+
+        except Exception:
+            continue
+
+    return None

@@ -1,11 +1,11 @@
 import pandas as pd
 base = pd.read_pickle('pickles/base.pkl')
 
-from funciones import obtener_stop_words
-stop_words = obtener_stop_words()
+idioma = 'es' # Opciones: es (español), en (inglés)
 
-rotulos = list(base['medio'].unique())
-k_rotulos = len(rotulos)
+from funciones import obtener_stop_words
+stop_words = obtener_stop_words(idioma)
+
 data = base['lemas'].tolist()
 
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -27,7 +27,7 @@ X_reduced = svd.fit_transform(X_tfidf)  # matriz reducida
 
 from yellowbrick.cluster import KElbowVisualizer
 # Visualizador
-visualizer = KElbowVisualizer(km, k=(2, 20)) # objeto de visualización
+visualizer = KElbowVisualizer(km, k=(2, 20), force_model=True) # objeto de visualización
 
 visualizer.fit(X_reduced) # carga los datos
 visualizer.show()

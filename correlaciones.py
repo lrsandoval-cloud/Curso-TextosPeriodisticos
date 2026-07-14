@@ -1,7 +1,7 @@
 # Indicar los medios a comparar en el gráfico de correlación de palabras
 # y en el top de palabras difereciadoras
-medios = ['lavanguardia', 'elpais']
-
+medios = [pickles = ['lavanguardia', 'lanacion']]
+idioma = 'es' # Opciones: es (español), en (inglés)
 
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
@@ -12,7 +12,7 @@ base = pd.read_pickle('pickles/base.pkl')
 rotulos = list(base['medio'].unique())
 
 palabras = obtener_dic_palabras(base)
-stop_words = obtener_stop_words()
+stop_words = obtener_stop_words('en')
 
 vectorizer = CountVectorizer(stop_words=stop_words)
 corpus = list(palabras.values())

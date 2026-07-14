@@ -1,4 +1,5 @@
 clusters = 8
+idioma = 'es' # Opciones: es (español), en (inglés)
 
 import pandas as pd
 import funciones
@@ -15,7 +16,7 @@ from sklearn.decomposition import PCA
 # objeto X_lsa
 
 base = pd.read_pickle('pickles/base.pkl')
-stop_words = funciones.obtener_stop_words()
+stop_words = funciones.obtener_stop_words(idioma)
 
 rotulos = list(base['medio'].unique())
 k_rotulos = len(rotulos)

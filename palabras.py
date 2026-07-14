@@ -2,14 +2,14 @@ import pandas as pd
 from funciones import obtener_dic_palabras
 from funciones import obtener_stop_words
 
-base = pd.read_pickle('pickles/base.pkl')
+idioma = 'en' # Opciones: es (español), en (inglés)
+base = pd.read_pickle('pickles/base_eng.pkl')
+
 rotulos = list(base['medio'].unique())
 
 palabras = obtener_dic_palabras(base)
 
-stop_words = obtener_stop_words()
-
-
+stop_words = obtener_stop_words(idioma)
 
 from sklearn.feature_extraction.text import CountVectorizer
 
